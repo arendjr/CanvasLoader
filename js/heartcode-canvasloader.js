@@ -239,7 +239,29 @@
 	* @return {String}
 	**/
 	p.getColor = function () { return this.color; };
-	/**
+    /**
+    * The color of the border of the shapes in HEX, or an empty string for no border
+    * @property color
+    * @protected
+    * @type String
+    * @default ""
+    **/
+    p.borderColor = "";
+    /**
+    * Sets hexadecimal color of the border
+    * @method setColor
+    * @public
+    * @param color {String} The default value is '#000000'
+    **/
+    p.setBorderColor = function (color) { this.borderColor = cRX.test(color) ? color : ""; this.redraw(); };
+    /**
+    * Returns the border color in a hexadecimal form
+    * @method getBorderColor
+    * @public
+    * @return {String}
+    **/
+    p.getBorderColor = function () { return this.borderColor; };
+    /**
 	* The number of shapes drawn on the loader canvas
 	* @property density
 	* @protected
@@ -354,11 +376,11 @@
 	* @protected
 	*/
 	p.draw = function () {
-        var i = 0, size, x, y, ang, rads, de = this.density, animBits = Math.round(de * this.range), bitMod, minBitMod = 0, d = 1000, c = this.cCon, di = this.diameter, e = 0.47;
+        var size, x, y, ang, rads, de = this.density, animBits = Math.round(de * this.range), bitMod, minBitMod = 0, d = 1000, c = this.cCon, di = this.diameter, e = 0.47, bc = this.borderColor;
         c.clearRect(0, 0, d, d);
         setAttr(this.can, {width: di, height: di});
         setAttr(this.cCan, {width: di, height: di});
-        while (i < de) {
+        for (var i = de - 1; i >= 0; i--) {
             bitMod = i <= animBits ? 1 - ((1 - minBitMod) / animBits * i) : bitMod = minBitMod;
             ang = 270 - 360 / de * i;
             rads = ang / 180 * Math.PI;
@@ -370,8 +392,12 @@
             c.arc(di * 0.5 + x, di * 0.5 + y, size * bitMod, 0, Math.PI * 2, false);
             c.closePath();
             c.fill();
+            if (bc) {
+                c.lineWidth = 1;
+                c.strokeStyle = bc;
+                c.stroke();
+            }
             c.restore();
-            ++i;
         }
 		this.tick(true);
 	};
